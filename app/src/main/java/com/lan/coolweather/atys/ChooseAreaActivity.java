@@ -1,6 +1,9 @@
 package com.lan.coolweather.atys;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -57,10 +60,19 @@ public class ChooseAreaActivity extends AppCompatActivity {
      * 当前选中的级别
      */
     private int currentLevel;
+    private boolean isFromWeatherAty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        isFromWeatherAty = getIntent().getBooleanExtra("isFromWeatherAty", false);
+        if(sp.getBoolean("city_selected",false) &&!isFromWeatherAty){
+            Intent intent = new Intent(this,WeatherActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
         setContentView(R.layout.activity_choose_area);
         lv_location = (ListView) findViewById(R.id.lv_location);
         tv_title = (TextView) findViewById(R.id.tv_title);
@@ -76,6 +88,13 @@ public class ChooseAreaActivity extends AppCompatActivity {
                 }else if(currentLevel == LEVEL_CITY){
                     selectedCity = cityList.get(position);
                     queryCounties();
+                }else if(currentLevel == LEVEL_COUNTY){
+                    String countyCode = countyList.get(position).getCountyCode();
+                    Intent intent = new Intent(getApplicationContext(),WeatherActivity.class);
+                    intent.putExtra("county_code",countyCode);
+                    startActivity(intent);
+                    finish();
+                    return;
                 }
             }
         });
@@ -237,6 +256,10 @@ public class ChooseAreaActivity extends AppCompatActivity {
             queryProvinces();
         }else if(currentLevel == LEVEL_COUNTY){
             queryCities();
+        }else if(isFromWeatherAty){
+            Intent intent = new Intent(this,WeatherActivity.class);
+            startActivity(intent);
+            finish();
         }
     }
 }

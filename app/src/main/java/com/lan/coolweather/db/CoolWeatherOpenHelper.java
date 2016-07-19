@@ -15,20 +15,20 @@ public class CoolWeatherOpenHelper extends SQLiteOpenHelper{
      * province_name：省名
      * province_code：省份代码
      */
-    public static final String CREAT_PROVINCE = "create table Province (" + "id integer primary key autoincrement," + "province_name text" +
-            "province_code text)";
+    public static final String CREAT_PROVINCE = "create table Province (" + "id integer primary key autoincrement," + "province_name text," +
+            "province_code text);";
     /**
      * 市建表语句
      * province_id：关联省份表的外键
      */
-    public static final String CREAT_CITY = "create table Province (" + "id integer primary key autoincrement," + "city_name text" +
-            "city_code text," + "province_id integer)";
+    public static final String CREAT_CITY = "create table City (" + "id integer primary key autoincrement," + "city_name text," +
+            "city_code text," + "province_id integer);";
     /**
      * 县建表语句
      * city_id：关联市表的外键
      */
-    public static final String CREAT_COUNTY = "create table Province (" + "id integer primary key autoincrement," + "county_name text" +
-            "county_code text" +"city_id integer)";
+    public static final String CREAT_COUNTY = "create table County (" + "id integer primary key autoincrement," + "county_name text," +
+            "county_code text," +"city_id integer);";
 
     public CoolWeatherOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -43,6 +43,5 @@ public class CoolWeatherOpenHelper extends SQLiteOpenHelper{
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
     }
 }
