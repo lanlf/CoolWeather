@@ -92,6 +92,7 @@ public class ChooseAreaActivity extends AppCompatActivity {
                     String countyCode = countyList.get(position).getCountyCode();
                     Intent intent = new Intent(getApplicationContext(),WeatherActivity.class);
                     intent.putExtra("county_code",countyCode);
+                    System.out.println("--------------"+countyCode);
                     startActivity(intent);
                     finish();
                     return;

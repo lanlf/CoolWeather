@@ -1,21 +1,26 @@
-package com.lan.coolweather.util;
+package com.lan.gettheweather;
+
+import android.text.TextUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.Connection;
 
 /**
  * Created by lan on 2016/7/19.
  */
 public class WeatherUtil {
-    static void getWeather() {
+    static String getWeather(String city) {
         String httpUrl = "http://apis.baidu.com/heweather/weather/free";
-        String httpArg = "city=beijing";
+        String httpArg = "city=" + city;
         String jsonResult = request(httpUrl, httpArg);
         System.out.println(jsonResult);
+        return jsonResult;
     }
+
 
     /**
      * @param httpUrl
@@ -27,10 +32,11 @@ public class WeatherUtil {
         String result = null;
         StringBuffer sbf = new StringBuffer();
         httpUrl = httpUrl + "?" + httpArg;
+        HttpURLConnection connection = null;
 
         try {
             URL url = new URL(httpUrl);
-            HttpURLConnection connection = (HttpURLConnection) url
+            connection = (HttpURLConnection) url
                     .openConnection();
             connection.setRequestMethod("GET");
             // 填入apikey到HTTP header
@@ -47,6 +53,10 @@ public class WeatherUtil {
             result = sbf.toString();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
         return result;
     }

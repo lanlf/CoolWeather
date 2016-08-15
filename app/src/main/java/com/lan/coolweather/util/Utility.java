@@ -2,7 +2,6 @@ package com.lan.coolweather.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
@@ -11,6 +10,7 @@ import com.lan.coolweather.model.City;
 import com.lan.coolweather.model.County;
 import com.lan.coolweather.model.Province;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
@@ -33,7 +33,6 @@ public class Utility {
            String [] allProvinces = response.split(",");
            if(allProvinces !=null && allProvinces.length >0){
                for (String p : allProvinces){
-                   System.out.println("*******" + p);
                    String[] array = p.split("\\|");
                    Province province = new Province();
                    province.setProvinceCode(array[0]);
@@ -104,7 +103,7 @@ public class Utility {
     public static void handleWeatherResponse(Context context, String response){
         try {
             JSONObject jsonObject = new JSONObject(response);
-            JSONObject weatherInfo = jsonObject.getJSONObject("weatherinfo");
+            /*JSONObject weatherInfo = jsonObject.getJSONObject("weatherinfo");
             String cityName = weatherInfo.getString("city");
             String weatherCode = weatherInfo.getString("cityid");
             String temp1 = weatherInfo.getString("temp1");
@@ -112,11 +111,24 @@ public class Utility {
             String weatherDesp = weatherInfo.getString("weather");
             String publishTime = "";
             if(response.contains("ptime"))
-            publishTime = weatherInfo.getString("ptime");
-            saveWeatherInfo(context,cityName, weatherCode,temp1, temp2 ,weatherDesp ,publishTime);
+            publishTime = weatherInfo.getString("ptime");*/
+            JSONArray weatherData = jsonObject.getJSONArray("HeWeather data service 3.0");
+            JSONObject basic = weatherData.getJSONObject(0).getJSONObject("basic");
+            String cityName = basic.getString("city");
+            JSONObject update = basic.getJSONObject("update");
+            String publishTime = update.getString("loc");
+            JSONObject now = weatherData.getJSONObject(0).getJSONObject("now");
+            String cTemp = now.getString("tmp");
+            JSONObject cond = now.getJSONObject("cond");
+            String weatherCode = cond.getString("code");
+            String weatherDesp = cond.getString("txt");
+            JSONArray daily_forecast = weatherData.getJSONObject(0).getJSONArray("daily_forecast");
+            JSONObject tmp = daily_forecast.getJSONObject(0).getJSONObject("tmp");
+            String temp1 = tmp.getString("min");
+            String temp2 = tmp.getString("max");
+            saveWeatherInfo(context,cityName, weatherCode,cTemp, temp1, temp2 ,weatherDesp ,publishTime);
         }catch (Exception e){
             e.printStackTrace();
-        }finally {
         }
     }
 
@@ -130,7 +142,7 @@ public class Utility {
      * @param weatherDesp
      * @param publishTime
      */
-    private static void saveWeatherInfo(Context context, String cityName, String weatherCode, String temp1, String temp2, String weatherDesp, String publishTime) {
+    private static void saveWeatherInfo(Context context, String cityName, String weatherCode,String cTemp, String temp1, String temp2, String weatherDesp, String publishTime) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy年M月d日", Locale.CHINA);
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putBoolean("city_selected",true);

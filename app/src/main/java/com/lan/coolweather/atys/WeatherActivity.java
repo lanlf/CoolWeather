@@ -2,10 +2,9 @@ package com.lan.coolweather.atys;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -46,11 +45,12 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         switchCity.setOnClickListener(this);
         refresh.setOnClickListener(this);
         String countyCode = getIntent().getStringExtra("county_code");
+        System.out.println(countyCode + "-------------");
         if (!TextUtils.isEmpty(countyCode)) {
             publishText.setText("同步中...");
             weatherInfoLayout.setVisibility(View.INVISIBLE);
             cityNameText.setVisibility(View.INVISIBLE);
-            queryWeatherCode(countyCode);
+            queryWeatherInfo(countyCode);
         } else {
             showWeather();
         }
@@ -76,34 +76,33 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
      *
      * @param countyCode
      */
-    private void queryWeatherCode(String countyCode) {
+ /*   private void queryWeatherCode(String countyCode) {
         String address = "http://www.weather.com.cn/data/list3/city" + countyCode + ".xml";
         System.out.println("+++++++"+address);
         queryFromServer(address, "countyCode");
-    }
+    }*/
 
     /**
      * 查找天气代号对应天气
      *
-     * @param weatherCode
+     * @param countyCode
      */
-    private void queryWeatherInfo(String weatherCode) {
-        String address = "http://www.weather.com.cn/data/cityinfo/" + weatherCode + ".html";
+    private void queryWeatherInfo(String countyCode) {
+        String address = "https://api.heweather.com/x3/weather?cityid=" +"CN101"+ countyCode +"&key=03c6b827fa284d0598ecce90fd079f1c";
         System.out.println("address"+address);
-        queryFromServer(address, "weatherCode");
+        queryFromServer(address);
     }
 
     /**
      * 根据传入的地址和类型向服务器查询天气代号或天气信息
      *
      * @param address
-     * @param type
      */
-    private void queryFromServer(String address, final String type) {
+    private void queryFromServer(String address) {
         HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {
             @Override
             public void onFinish(String response) {
-                if ("countyCode".equals(type)) {
+               /* if ("countyCode".equals(type)) {
                     if (!TextUtils.isEmpty(response)) {
                         System.out.println(response);
                         String[] array = response.split("\\|");
@@ -113,18 +112,16 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                             queryWeatherInfo(weatherCode);
                         }
                     }
-                } else if ("weatherCode".equals(type)) {
-                    System.out.println("response:"+ response);
-                    Utility.handleWeatherResponse(WeatherActivity.this, response);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            showWeather();
-                        }
-                    });
-                }
+                } else if ("weatherCode".equals(type)) {*/
+                System.out.println("response:" + response);
+                Utility.handleWeatherResponse(WeatherActivity.this, response);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        showWeather();
+                    }
+                });
             }
-
             @Override
             public void onError(Exception e) {
                 e.printStackTrace();
@@ -164,6 +161,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         Intent intent = new Intent(getApplicationContext(),ChooseAreaActivity.class);
         intent.putExtra("isFromWeatherAty",true);
         startActivity(intent);
+        finish();
     }
 
 }
